@@ -33,42 +33,59 @@ SQL_CREATE_TABLE_MESSAGES = """
     );
     """
 
-try:
-    cnx = connect(user=USER, password=PASSWORD, host=HOST)
-    cnx.autocommit = True
-    cursor = cnx.cursor()
-    print(SQL_CREATE_DB)
-    cursor.execute(sql)
-except DuplicateDatabase as e:
-    print(f'The DB: \"{DB}\" Exists!\n {e}')
-except OperationalError:
-    print("Nie połączono.")
-else:
-    cnx.close()
 
-try:
-    cnx = connect(user=USER, password=PASSWORD, host=HOST, database=DB)
-    cursor = cnx.cursor()
-    cursor.execute(SQL_CREATE_TABLE_USERS)
-    cnx.commit()
-except DuplicateTable:
-    print("The Table \"users\" are exists!")
-except OperationalError:
-    print("connection lost!.")
-else:
-    cnx.close()
+def create_databse(sql_query, U, P, H):
+    """
+    :param sql_query: Query for createing databse:
+    - example: "CREATE DATABASE cars_db;"
+    :param U: User
+    :param P: Password
+    :param H: Host
+    :return: return "True" if connected to the database and a query is performed
+    """
+    result = None
+    try:
+        cnx = connect(user=U, password=P, host=H)
+        cnx.autocommit = True
+        cursor = cnx.cursor()
+        cursor.execute(sql_query)
+        result = True
+    except DuplicateDatabase as e:
+        print(f'The database already Exists!\n {e}')
+    except OperationalError:
+        print("connection lost!.")
+    else:
+        cnx.close()
+    return result
 
-try:
-    cnx = connect(user=USER, password=PASSWORD, host=HOST, database=DB)
-    cursor = cnx.cursor()
-    cursor.execute(SQL_CREATE_TABLE_MESSAGES)
-    cnx.commit()
-    print("Table created.")
-except DuplicateTable as DT:
-    print(f'Table: "messages" already exists!\n{DT} ')
-except OperationalError:
-    print("Connection lost!")
-except ProgrammingError:
-    print("Query returns nothing.")
-else:
-    cnx.close()
+
+def create_table(sql_query, U, P, H, DB):
+    """
+    :param sql_query: Query for createing table
+    :param U: User
+    :param P: Password
+    :param H: Host
+    :param DB: name of Database to connect
+    :return: return "True" if connected to the database and a query is performed
+    """
+    result = None
+    try:
+        cnx = connect(user=U, password=P, host=H, database=DB)
+        cursor = cnx.cursor()
+        cursor.execute(sql_query)
+        cnx.commit()
+        result = True
+    except DuplicateTable as DT:
+        print(f"The table already exists!\n{DT}")
+    except OperationalError:
+        print("connection lost!.")
+    else:
+        cnx.close()
+    return result
+
+
+print(create_databse(SQL_CREATE_DB, USER, PASSWORD, HOST))
+print(create_table(SQL_CREATE_TABLE_USERS, USER, PASSWORD, HOST, DB))
+print(create_table(SQL_CREATE_TABLE_MESSAGES, USER, PASSWORD, HOST, DB))
+
+
