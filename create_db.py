@@ -2,7 +2,6 @@ from psycopg2 import connect, OperationalError, ProgrammingError
 from psycopg2.errors import DuplicateDatabase, DuplicateTable
 
 
-
 with open("db_connect") as file:
     connection = [line.strip() for line in file.readlines()]
 
@@ -38,10 +37,8 @@ try:
     cnx = connect(user=USER, password=PASSWORD, host=HOST)
     cnx.autocommit = True
     cursor = cnx.cursor()
-    print("połączono.")
     print(SQL_CREATE_DB)
     cursor.execute(sql)
-    print('Zrobione')
 except DuplicateDatabase as e:
     print(f'The DB: \"{DB}\" Exists!\n {e}')
 except OperationalError:
@@ -52,7 +49,6 @@ else:
 try:
     cnx = connect(user=USER, password=PASSWORD, host=HOST, database=DB)
     cursor = cnx.cursor()
-    print("połączono.")
     cursor.execute(SQL_CREATE_TABLE_USERS)
     cnx.commit()
 except DuplicateTable:
@@ -65,7 +61,6 @@ else:
 try:
     cnx = connect(user=USER, password=PASSWORD, host=HOST, database=DB)
     cursor = cnx.cursor()
-    print("przystępuję do tworzenia tabeli \"messges\".")
     cursor.execute(SQL_CREATE_TABLE_MESSAGES)
     cnx.commit()
     print("Table created.")
