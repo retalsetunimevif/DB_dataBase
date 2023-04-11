@@ -50,10 +50,12 @@ def create_databse(sql_query, U, P, H):
         cursor = cnx.cursor()
         cursor.execute(sql_query)
         result = True
-    except DuplicateDatabase as e:
-        print(f'The database already Exists!\n {e}')
-    except OperationalError:
+    except DuplicateDatabase as DD:
+        print(f'The database already Exists!')
+        result = DD
+    except OperationalError as OE:
         print("connection lost!.")
+        result = OE
     else:
         cnx.close()
     return result
@@ -76,16 +78,15 @@ def create_table(sql_query, U, P, H, DB):
         cnx.commit()
         result = True
     except DuplicateTable as DT:
-        print(f"The table already exists!\n{DT}")
-    except OperationalError:
-        print("connection lost!.")
+        print(f"The table already exists!")
+        result = DT
+    except OperationalError as OE:
+        result = OE
     else:
         cnx.close()
     return result
 
-
-print(create_databse(SQL_CREATE_DB, USER, PASSWORD, HOST))
-print(create_table(SQL_CREATE_TABLE_USERS, USER, PASSWORD, HOST, DB))
-print(create_table(SQL_CREATE_TABLE_MESSAGES, USER, PASSWORD, HOST, DB))
-
-
+if __name__ == "__main__":
+    print(create_databse(SQL_CREATE_DB, USER, PASSWORD, HOST))
+    print(create_table(SQL_CREATE_TABLE_USERS, USER, PASSWORD, HOST, DB))
+    print(create_table(SQL_CREATE_TABLE_MESSAGES, USER, PASSWORD, HOST, DB))

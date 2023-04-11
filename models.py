@@ -164,5 +164,5 @@ def connect_to_DB(user, password, host, db):
     else:
         cnx.close()
 
-
-connect_to_DB(USER, PASS, HOST, DB)
+if __name__ == "__main__":
+    connect_to_DB(USER, PASS, HOST, DB)
