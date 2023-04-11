@@ -1,6 +1,17 @@
 from psycopg2 import connect, ProgrammingError
-from clcrypto import hash_password
 import time
+
+from clcrypto import hash_password
+
+
+with open("db_connect") as file:
+    user, host, password = file.readlines()
+
+
+USER = user.strip()
+PASS = password.strip()
+HOST = host.strip()
+DB = "users_db"
 
 
 class User:
@@ -26,7 +37,7 @@ class User:
         return self.set_password(password)
 
     def save_to_db(self, cursor):
-        if self._id == -1:
+        if self.id == -1:
             sql = """INSERT INTO users(username, hashed_password)
                     VALUES (%s, %s) RETURNING id;
                     """
@@ -35,9 +46,8 @@ class User:
             return True
         else:
             sql = """UPDATE users SET username=%s, hashed_password=%s
-            WHERE id=%s
-            """
-            cursor.execute(sql, self.username, self.hashed_password, self.id)
+                        WHERE id=%s;"""
+            cursor.execute(sql, (self.username, self.hashed_password, self.id))
             return True
 
     @staticmethod
@@ -101,7 +111,7 @@ class User:
         return True
 
 class Message:
-    def __init__(self, from_id, to_id, text, creation_date=None):
+    def __init__(self, from_id, to_id, text='', creation_date=None):
         self._id = -1
         self.from_id = from_id
         self.to_id = to_id
@@ -112,44 +122,47 @@ class Message:
     def id(self):
         return self._id
 
+    def set_message(self, text):
+        self.text = text
 
     def save_to_db(self, cursor):
-        if self._id = 1:
-            sql = "INSERT INTO messages(from_id, to_id, text, creation_date)"
-            VALUES(%s, %s, %s, %s)
+        if self._id == -1:
+            sql = """INSERT INTO messages(from_id, to_id, text, creation_date)
+            VALUES(%s, %s, %s, %s) RETURNING id;"""
             cursor.execute(sql, (self.from_id, self.to_id, self.text, time.strftime("%d-%m-%Y %H:%M:%S")))
             self._id = cursor.fetchone()[0]
             return True
-        # else:
-        #     sql = "UPDATE messages SET text=%s, cration_date=%s where id=%s and from_id=%s and to_id=%s;)
-        #     cursor.execute(sql, ())
+        else:
+            sql = "UPDATE messages SET text=%s, creation_date=%s WHERE id=%s;"
+            cursor.execute(sql, (self.text, time.strftime("%d-%m-%Y %H:%M:%S"), self._id))
+            return True
         return None
 
-# u1 = User("marcin", "TestNr1")
-# u3 = User("marcin", "testnr2")
-# u5 = User("Cat", 'animalfood')
-# # u1.hashed_password = "nowehaslo"
-# # print(u1.hashed_password)
-# try:
-#     cnx = connect(user="postgres", password="coderslab", host="localhost", database="users_db")
-#     cnx.autocommit = True
-#     # u1.save_to_db(cnx.cursor())
-#     # u3.save_to_db(cnx.cursor())
-#     # u5.save_to_db(cnx.cursor())
-#     u2 = User.load_user_by_username(cnx.cursor(), "marcin")
-#     u4 = User.load_user_by_id(cnx.cursor(), 2)
-#     all_users = User.load_all_users(cnx.cursor())
-#     users_the_same_name = User.load_users_by_username(cnx.cursor(), "marcin")
-# except ProgrammingError as PE:
-#     print(PE)
-# else:
-#     cnx.close()
-# print(u2.id, u2.username, u2.hashed_password)
-# print(u4.id, u4.username, u4.hashed_password)
-# print(all_users[0].username, all_users[1].id)
-# for user in all_users:
-#     print(user.id, "|", user.username, "|", user.hashed_password)
-#
-# print(users_the_same_name)
-# for user in users_the_same_name:
-#     print(user.id, user.username,user.hashed_password)
+    @staticmethod
+    def load_all_messages(cursor):
+        sql = "SELECT id, from_id, to_id, text, creation_date FROM messages;"
+        cursor.execute(sql)
+        messages = []
+        for row in cursor.fetchall():
+            id_, from_id, to_id, text, creation_date = row
+            load_message = Message(from_id, to_id)
+            load_message._id = id_
+            load_message.text = text
+            load_message.creation_date = creation_date
+            messages.append(load_message)
+        return messages
+
+
+def connect_to_DB(user, password, host, db):
+    try:
+        cnx = connect(user=user, password=password, host=host, database=db)
+        cnx.autocommit = True
+
+
+    except ProgrammingError as PE:
+        print(PE)
+    else:
+        cnx.close()
+
+
+connect_to_DB(USER, PASS, HOST, DB)
