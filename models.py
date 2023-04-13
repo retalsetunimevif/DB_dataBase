@@ -4,14 +4,14 @@ import time
 from clcrypto import hash_password
 
 
-with open("db_connect") as file:
-    user, host, password = file.readlines()
-
-
-USER = user.strip()
-PASS = password.strip()
-HOST = host.strip()
-DB = "users_db"
+# with open("db_connect") as file:
+#     user, host, password = file.readlines()
+#
+#
+# USER = user.strip()
+# PASS = password.strip()
+# HOST = host.strip()
+# DB = "users_db"
 
 
 class User:
@@ -153,16 +153,16 @@ class Message:
         return messages
 
 
-def connect_to_DB(user, password, host, db):
-    try:
-        cnx = connect(user=user, password=password, host=host, database=db)
-        cnx.autocommit = True
-
-
-    except ProgrammingError as PE:
-        print(PE)
-    else:
-        cnx.close()
+# def connect_to_DB(user, password, host, db):
+#     try:
+#         cnx = connect(user=user, password=password, host=host, database=db)
+#         cnx.autocommit = True
+#
+#
+#     except ProgrammingError as PE:
+#         print(PE)
+#     else:
+#         cnx.close()
 
 if __name__ == "__main__":
     connect_to_DB(USER, PASS, HOST, DB)
