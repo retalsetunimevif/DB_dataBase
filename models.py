@@ -61,7 +61,6 @@ class User:
             load_user._id = id_
             load_user._hashed_password = hash_password
             return load_user
-            return True
         return None
 
     @staticmethod
@@ -105,7 +104,8 @@ class User:
         return users
 
     def delete_user(self, cursor):
-        sql = "DELETE FROM user WHERE id=%s"
+        print("deleting... ")
+        sql = "DELETE FROM users WHERE id=%s"
         cursor.execute(sql, (self._id, ))
         self._id = -1
         return True
@@ -165,4 +165,5 @@ class Message:
 #         cnx.close()
 
 if __name__ == "__main__":
-    connect_to_DB(USER, PASS, HOST, DB)
+    # connect_to_DB(USER, PASS, HOST, DB)
+    pass
