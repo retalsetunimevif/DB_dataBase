@@ -132,17 +132,21 @@ class Message:
             cursor.execute(sql, (self.from_id, self.to_id, self.text, time.strftime("%d-%m-%Y %H:%M:%S")))
             self._id = cursor.fetchone()[0]
             return True
-        else:
-            sql = "UPDATE messages SET text=%s, creation_date=%s WHERE id=%s;"
-            cursor.execute(sql, (self.text, time.strftime("%d-%m-%Y %H:%M:%S"), self._id))
-            return True
+        # else:
+        #     sql = "UPDATE messages SET text=%s, creation_date=%s WHERE id=%s;"
+        #     cursor.execute(sql, (self.text, time.strftime("%d-%m-%Y %H:%M:%S"), self._id))
+        #     return True
         return None
 
     @staticmethod
-    def load_all_messages(cursor):
-        sql = "SELECT id, from_id, to_id, text, creation_date FROM messages;"
-        cursor.execute(sql)
+    def load_all_messages(cursor, user_id=None):
         messages = []
+        if user_id:
+            sql = "SELECT id, from_id, to_id, text, creation_date FROM messages where to_id=%s;"
+            cursor.execute(sql, (user_id, ))
+        else:
+            sql = "SELECT id, from_id, to_id, text, creation_date FROM messages;"
+            cursor.execute(sql)
         for row in cursor.fetchall():
             id_, from_id, to_id, text, creation_date = row
             load_message = Message(from_id, to_id)

@@ -10,7 +10,6 @@ from models import User
 with open("db_connect") as file:
     user, host, password = file.readlines()
 
-
 USER = user.strip()
 PASS = password.strip()
 HOST = host.strip()
@@ -89,8 +88,7 @@ def connect_to_DB(user=USER, password=PASS, host=HOST, db=DB):
         elif args.list:
             print_all_users(users)
         else:
-            print("help")
-            print(args.print_help())
+            parser.print_help()
     except ProgrammingError as PE:
         print(PE)
     else:
